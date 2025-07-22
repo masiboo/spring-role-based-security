@@ -9,6 +9,8 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -27,10 +29,16 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService(PasswordEncoder encoder) {
         return new InMemoryUserDetailsManager(
-            User.withUsername("admin").password("{noop}admin123").roles("ADMIN").build(),
-            User.withUsername("user").password("{noop}user123").roles("USER").build()
+                User.withUsername("admin").password(encoder.encode("admin123")).roles("ADMIN").build(),
+                User.withUsername("user").password(encoder.encode("user123")).roles("USER").build()
         );
     }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // 🔐 BCrypt is recommended
+    }
+
 }
